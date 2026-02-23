@@ -1,0 +1,444 @@
+openapi: 3.1.0
+info:
+  title: UniGen API
+  version: 0.1.0-draft
+  description: |
+    One unified endpoint for AI agents to generate images, video, and audio from any provider.
+    No API keys. No accounts. Just USDC.
+
+    UniGen is a pipe. The agent specifies the provider and model. UniGen passes the request through.
+    No routing optimization. No model recommendations.
+  contact:
+    url: https://unigen-api.ai
+  license:
+    name: MIT
+    url: https://github.com/nobuhiro103139/unigen-api/blob/init/LICENSE
+
+servers:
+  - url: https://unigen-api.ai/v1
+    description: Production
+
+paths:
+  /v1/generate:
+    post:
+      operationId: generateMedia
+      summary: Generate media (image, video, audio)
+      description: |
+        Submit a generation request. The agent must specify the provider and model.
+        UniGen executes exactly what is requested. Payment is handled via x402 (USDC).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateRequest'
+      responses:
+        '200':
+          description: Generation completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateResponse'
+        '402':
+          description: Payment required (insufficient USDC balance)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request (unsupported provider/model or bad parameters)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/estimate:
+    post:
+      operationId: estimateGeneration
+      summary: Get pre-generation estimate
+      description: |
+        Returns estimated price, generation time, and success rate for a given request
+        without executing it. Use this before /v1/generate to check feasibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimateRequest'
+      responses:
+        '200':
+          description: Estimate returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimateResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /v1/capabilities:
+    get:
+      operationId: listCapabilities
+      summary: List supported providers and models
+      description: |
+        Returns all available providers and their models, grouped by media type.
+        Use this to discover what can be generated.
+      responses:
+        '200':
+          description: Capabilities returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilitiesResponse'
+
+  /v1/pricing:
+    get:
+      operationId: getPricing
+      summary: Current pricing table
+      description: |
+        Returns current USDC pricing per provider, model, and media type.
+        Prices may fluctuate based on provider costs.
+      responses:
+        '200':
+          description: Pricing table returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricingResponse'
+
+  /v1/status:
+    get:
+      operationId: getStatus
+      summary: Service operational status
+      description: |
+        Returns operational status for each provider. Check this before generating
+        to avoid sending requests to unavailable providers.
+      responses:
+        '200':
+          description: Status returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+
+  /v1/balance:
+    get:
+      operationId: getBalance
+      summary: Check USDC balance
+      description: |
+        Returns the USDC balance for the specified wallet address.
+        Use this to verify sufficient funds before generating.
+      parameters:
+        - name: wallet
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Wallet address to check balance for
+      responses:
+        '200':
+          description: Balance returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '400':
+          description: Invalid wallet address
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    GenerateRequest:
+      type: object
+      required:
+        - provider
+        - model
+        - media_type
+        - prompt
+      properties:
+        provider:
+          type: string
+          description: Provider identifier (e.g. "openai", "stability", "replicate")
+        model:
+          type: string
+          description: Model identifier as listed in /v1/capabilities
+        media_type:
+          type: string
+          enum: [image, video, audio]
+          description: Type of media to generate
+        prompt:
+          type: string
+          description: Generation prompt
+        parameters:
+          type: object
+          additionalProperties: true
+          description: Provider-specific parameters (passed through as-is)
+        wallet:
+          type: string
+          description: Wallet address for USDC payment via x402
+
+    GenerateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique generation ID
+        status:
+          type: string
+          enum: [completed, processing]
+        media_type:
+          type: string
+          enum: [image, video, audio]
+        output:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+              description: URL to the generated media
+            content_type:
+              type: string
+              description: MIME type of the output
+            size_bytes:
+              type: integer
+        cost:
+          type: object
+          properties:
+            amount:
+              type: string
+              description: USDC amount charged
+            currency:
+              type: string
+              enum: [USDC]
+            tx_hash:
+              type: string
+              description: On-chain transaction hash
+        provider:
+          type: string
+        model:
+          type: string
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+              description: Suggested next API call or action
+            reason:
+              type: string
+              description: Why this action is suggested
+            endpoint:
+              type: string
+              description: Relevant endpoint if applicable
+
+    EstimateRequest:
+      type: object
+      required:
+        - provider
+        - model
+        - media_type
+        - prompt
+      properties:
+        provider:
+          type: string
+        model:
+          type: string
+        media_type:
+          type: string
+          enum: [image, video, audio]
+        prompt:
+          type: string
+        parameters:
+          type: object
+          additionalProperties: true
+
+    EstimateResponse:
+      type: object
+      properties:
+        provider:
+          type: string
+        model:
+          type: string
+        media_type:
+          type: string
+        estimated_cost:
+          type: object
+          properties:
+            amount:
+              type: string
+              description: Estimated USDC cost
+            currency:
+              type: string
+              enum: [USDC]
+        estimated_time_seconds:
+          type: number
+          description: Estimated generation time in seconds
+        success_rate:
+          type: number
+          description: Historical success rate (0.0 to 1.0)
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+            reason:
+              type: string
+            endpoint:
+              type: string
+
+    CapabilitiesResponse:
+      type: object
+      properties:
+        providers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              models:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    media_types:
+                      type: array
+                      items:
+                        type: string
+                        enum: [image, video, audio]
+                    max_resolution:
+                      type: string
+                    max_duration_seconds:
+                      type: number
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+            reason:
+              type: string
+            endpoint:
+              type: string
+
+    PricingResponse:
+      type: object
+      properties:
+        updated_at:
+          type: string
+          format: date-time
+        prices:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+              model:
+                type: string
+              media_type:
+                type: string
+              price_usdc:
+                type: string
+                description: Price per generation in USDC
+              unit:
+                type: string
+                description: What the price covers (e.g. "per image", "per second of video")
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+            reason:
+              type: string
+            endpoint:
+              type: string
+
+    StatusResponse:
+      type: object
+      properties:
+        overall:
+          type: string
+          enum: [operational, degraded, outage]
+        providers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              status:
+                type: string
+                enum: [operational, degraded, outage]
+              latency_ms:
+                type: number
+              last_checked:
+                type: string
+                format: date-time
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+            reason:
+              type: string
+            endpoint:
+              type: string
+
+    BalanceResponse:
+      type: object
+      properties:
+        wallet:
+          type: string
+        balance:
+          type: string
+          description: USDC balance
+        currency:
+          type: string
+          enum: [USDC]
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+            reason:
+              type: string
+            endpoint:
+              type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+        suggestion:
+          type: object
+          description: Next action suggestion for the agent
+          properties:
+            action:
+              type: string
+            reason:
+              type: string
+            endpoint:
+              type: string

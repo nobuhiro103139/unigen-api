@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniGen API</title>
+  <meta name="description" content="One unified endpoint for AI agents to generate images, video, and audio from any provider. No API keys. No accounts. Just USDC.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://unigen-api.ai/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "UniGen API",
+    "description": "One unified endpoint for AI agents to generate images, video, and audio from any provider. No API keys. No accounts. Just USDC.",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "url": "https://unigen-api.ai",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "description": "Pay-per-use via USDC (x402 protocol). No subscription. No accounts."
+    },
+    "featureList": [
+      "Unified media generation endpoint (image, video, audio)",
+      "Pre-generation cost and time estimates",
+      "Multi-provider capability discovery",
+      "Real-time pricing",
+      "Service status monitoring",
+      "USDC balance management"
+    ],
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "AI Agents"
+    }
+  }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: monospace; background: #000; color: #e0e0e0; padding: 2rem; line-height: 1.6; }
+    h1 { color: #fff; font-size: 1.4rem; margin-bottom: 0.5rem; }
+    p.declaration { color: #a0a0a0; margin-bottom: 2rem; max-width: 72ch; }
+    h2 { color: #fff; font-size: 1.1rem; margin: 2rem 0 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+    table { border-collapse: collapse; width: 100%; max-width: 80ch; }
+    th, td { text-align: left; padding: 0.4rem 1rem 0.4rem 0; }
+    th { color: #888; font-weight: normal; font-size: 0.85rem; border-bottom: 1px solid #333; }
+    td { border-bottom: 1px solid #1a1a1a; }
+    td:first-child { color: #7ec8e3; }
+    code { background: #111; padding: 0.1rem 0.3rem; font-size: 0.9rem; }
+    a { color: #7ec8e3; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .meta { margin-top: 3rem; color: #555; font-size: 0.8rem; }
+    .meta a { color: #555; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UniGen API</h1>
+    <p class="declaration">One unified endpoint for AI agents to generate images, video, and audio from any provider. No API keys. No accounts. Just USDC.</p>
+  </header>
+
+  <main>
+    <h2>Base URL</h2>
+    <p><code>https://unigen-api.ai/v1</code></p>
+
+    <h2>Endpoints</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Method</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>/v1/generate</code></td>
+          <td>POST</td>
+          <td>Generate media (image, video, audio). Specify provider and model. UniGen passes through.</td>
+        </tr>
+        <tr>
+          <td><code>/v1/estimate</code></td>
+          <td>POST</td>
+          <td>Pre-generation estimate: price, estimated time, success rate.</td>
+        </tr>
+        <tr>
+          <td><code>/v1/capabilities</code></td>
+          <td>GET</td>
+          <td>List supported providers and models.</td>
+        </tr>
+        <tr>
+          <td><code>/v1/pricing</code></td>
+          <td>GET</td>
+          <td>Current pricing table per provider and model.</td>
+        </tr>
+        <tr>
+          <td><code>/v1/status</code></td>
+          <td>GET</td>
+          <td>Service operational status per provider.</td>
+        </tr>
+        <tr>
+          <td><code>/v1/balance</code></td>
+          <td>GET</td>
+          <td>Check USDC balance for a wallet address.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Payment</h2>
+    <p>USDC via <a href="https://www.x402.org/">x402 protocol</a>. No API keys. No accounts. Pay per request.</p>
+
+    <h2>For Agents</h2>
+    <p>
+      <a href="/openapi.yaml">OpenAPI Spec</a> &middot;
+      <a href="/.well-known/ai-plugin.json">Plugin Manifest</a> &middot;
+      <a href="/llms.txt">llms.txt</a>
+    </p>
+  </main>
+
+  <footer class="meta">
+    <p>UniGen API &middot; <a href="https://github.com/nobuhiro103139/unigen-api">Source</a></p>
+  </footer>
+</body>
+</html>

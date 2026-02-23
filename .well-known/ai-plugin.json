@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "UniGen API",
+  "name_for_model": "unigen_api",
+  "description_for_human": "One unified endpoint for AI agents to generate images, video, and audio from any provider. No API keys. No accounts. Just USDC.",
+  "description_for_model": "UniGen API is a unified media generation gateway. It proxies requests to multiple AI providers for image, video, and audio generation. The agent specifies the provider and model; UniGen passes the request through without modification. Payment is USDC via x402 protocol. Endpoints: /v1/generate (create media), /v1/estimate (get cost/time/success rate before generating), /v1/capabilities (list providers and models), /v1/pricing (current prices), /v1/status (provider availability), /v1/balance (check USDC balance). UniGen does not select or recommend models. The agent decides.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://unigen-api.ai/openapi.yaml"
+  },
+  "logo_url": "https://unigen-api.ai/logo.png",
+  "contact_email": "",
+  "legal_info_url": "https://github.com/nobuhiro103139/unigen-api/blob/init/LICENSE"
+}
