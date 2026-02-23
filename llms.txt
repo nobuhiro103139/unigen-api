@@ -1,0 +1,37 @@
+# UniGen API
+
+> One unified endpoint for AI agents to generate images, video, and audio from any provider. No API keys. No accounts. Just USDC.
+
+## What is this
+
+UniGen API is a unified media generation gateway. It exposes a single HTTP API that proxies requests to multiple AI providers (image, video, audio generation). The agent specifies the provider and model; UniGen passes the request through. No routing optimization. No model recommendations. It is a pipe.
+
+## Who is this for
+
+AI agents. Not humans. The API is designed to be consumed programmatically by autonomous agents that need to generate media as part of their workflows.
+
+## Base URL
+
+https://unigen-api.ai/v1
+
+## Endpoints
+
+- POST /v1/generate — Generate media. Agent specifies provider, model, and parameters.
+- POST /v1/estimate — Get price, estimated time, and success rate before generating.
+- GET /v1/capabilities — List all supported providers and models.
+- GET /v1/pricing — Current pricing table per provider and model.
+- GET /v1/status — Service operational status per provider.
+- GET /v1/balance — Check USDC balance for a wallet address.
+
+## Payment
+
+USDC via x402 protocol. No API keys. No accounts. No subscriptions. Pay per request. The x402 HTTP payment protocol enables machine-to-machine payments without human intervention.
+
+## Integration
+
+- OpenAPI spec: https://unigen-api.ai/openapi.yaml
+- Plugin manifest: https://unigen-api.ai/.well-known/ai-plugin.json
+
+## Key Principle
+
+UniGen does not choose models for you. The agent decides which provider and model to use. UniGen executes exactly what is requested. This is by design.
