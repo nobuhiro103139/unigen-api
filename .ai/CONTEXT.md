@@ -44,7 +44,7 @@ UniGen is a **pipe**. The agent specifies the provider and model. UniGen passes 
 
 ## Repository Structure
 
-```
+```text
 unigen-api/
 ├── .ai/
 │   ├── README.md

@@ -15,8 +15,11 @@ info:
     url: https://github.com/nobuhiro103139/unigen-api/blob/init/LICENSE
 
 servers:
-  - url: https://unigen-api.ai/v1
+  - url: https://unigen-api.ai
     description: Production
+
+security:
+  - x402: []
 
 paths:
   /v1/generate:
@@ -153,6 +156,15 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 components:
+  securitySchemes:
+    x402:
+      type: http
+      scheme: bearer
+      description: |
+        Payment via x402 protocol. USDC is sent per-request.
+        No API keys or accounts required. The x402 payment header
+        is attached automatically by compliant agents.
+
   schemas:
     GenerateRequest:
       type: object
